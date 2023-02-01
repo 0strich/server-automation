@@ -10,10 +10,10 @@ function push() {
   git push
 }
 
-if [ $1 == "patch" ]; then
+if [ "$1" == "patch" ]; then
   push
-elif [ $1 == "minor" ]; then
+elif [ "$1" == "minor" ]; then
   push
-elif [ $1 == "major" ]; then
+elif [ "$1" == "major" ]; then
   push
 fi

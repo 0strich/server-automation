@@ -25,14 +25,14 @@ function run() {
   docker exec -it $2 /bin/sh
 }
 
-if [ $1 == "clean" ]; then
+if [ "$1" == "clean" ]; then
   clean
-elif [ $1 == "up" ]; then
+elif [ "$1" == "up" ]; then
   up
-elif [ $1 == "down" ]; then
+elif [ "$1" == "down" ]; then
   down
-elif [ $1 == "rebuild" ]; then
+elif [ "$1" == "rebuild" ]; then
   rebuild
-elif [ $1 == "run" ]; then
+elif [ "$1" == "run" ]; then
   run
 fi
