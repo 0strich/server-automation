@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  nodejs:
+    image: mynode
+    container_name: mynode
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    ports:
+      - ${PORT}:3000
+    volumes:
+      - ./node/views:/project/node/views
+    environment:
+      - NODE_ENV=production
+      - VIRTUAL_HOST=nodejs.saltmine.io
+      - LETSENCRYPT_HOST=nodejs.saltmine.io
+      - LETSENCRYPT_EMAIL=rich@salt-mine.io
+    restart: always
+    stdin_open: true
+
+  react:
+    container_name: myreact
+    build:
+      context: .
+      dockerfile: Dockerfile-react
+    ports:
+      - 4002:3000
+    volumes:
+      - ./my-react/src:/project/myreact/src
+    environment:
+      - VIRTUAL_HOST=reactjs.saltmine.io
+      - LETSENCRYPT_HOST=reactjs.saltmine.io
+      - LETSENCRYPT_EMAIL=rich@salt-mine.io
+    restart: always
+    stdin_open: true
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
