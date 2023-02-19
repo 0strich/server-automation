@@ -31,7 +31,7 @@ services:
 
   reactjs:
     container_name: reactjs
-    biuld:
+    build:
       context: /project/reactjs
       dockerfile: Dockerfile
     environment:
@@ -42,7 +42,7 @@ services:
 
   express:
     container_name: express
-    biuld:
+    build:
       context: /project/nodejs
       dockerfile: Dockerfile
     environment:
