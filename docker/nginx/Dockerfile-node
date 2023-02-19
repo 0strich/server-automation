@@ -1,0 +1,17 @@
+# 이미지 
+FROM node:14-alpiner
+
+# 앱 폴더 생성
+WORKDIR /app
+
+# 의존성 설치
+ENV PATH /app/node_modules/.bin:$PATH
+COPY package*.json ./
+RUN npm install
+RUN npm install pm2 -g
+
+# 앱 소스 추가
+COPY . .
+
+# 명령어 실행
+CMD ['pm2-runtime', 'start', "ecosystem.config.js"]

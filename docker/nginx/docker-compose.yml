@@ -1,42 +1,49 @@
-version: "3.3"
-
+version: "3.9"
 services:
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/log:/var/log/nginx
-      - ./www:/var/www/html
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: jwilder/nginx-proxy
     ports:
       - 80:80
       - 443:443
-
-  certbot:
-    depends_on:
-      - nginx
-    image: certbot/certbot
-    container_name: certbot
     volumes:
-      - ./certbot/etc:/etc/letsencrypt
-      - ./certbot/var:/var/lib/letsencrypt
-      - ./www:/var/www/html
-    command: certonly --webroot --webroot-path=/var/www/html --email gee8196@gmail.com --agree-tos --no-eff-email --force-renewal -d nodejs.saltmine.io -d www.nodejs.saltmine.io
-
-  nginx-letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion:stable
-    container_name: ${LETS_ENCRYPT:-nginx-letsencrypt}
+      - ../nginx/certs:/etc/nginx/certs
+      - ../nginx/log:/var/log/nginx
+      - html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+      - conf:/etc/nginx/conf.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     restart: always
+
+  letsencrypt-nginx-proxy:
+    container_name: letsencrypt-nginx-proxy
+    image: jrcs/letsencrypt-nginx-proxy-companior
+    depends_on:
+      - nginx-proxy
     volumes:
-      - ${NGINX_FILES_PATH:-./data}/conf.d:/etc/nginx/conf.d
-      - ${NGINX_FILES_PATH:-./data}/vhost.d:/etc/nginx/vhost.d
-      - ${NGINX_FILES_PATH:-./data}/html:/usr/share/nginx/html
-      - ${NGINX_FILES_PATH:-./data}/certs:/etc/nginx/certs:rw
+      - ../nginx/certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
+
+  user-frontend:
     environment:
-      NGINX_DOCKER_GEN_CONTAINER: ${DOCKER_GEN:-nginx-gen}
-      NGINX_PROXY_CONTAINER: ${NGINX_WEB:-nginx-web}
-    logging:
-      driver: ${NGINX_LETSENCRYPT_LOG_DRIVER:-json-file}
-      options:
-        max-size: ${NGINX_LETSENCRYPT_LOG_MAX_SIZE:-2m}
-        max-file: ${NGINX_LETSENCRYPT_LOG_MAX_FILE:-10}
+      - VIRTUAL_HOST=reactjs.${HOST}
+      - LETSENCRYPT_HOST=reactjs.${HOST}
+    expose:
+      - 3000
+
+  express:
+    environment:
+      - VIRTUAL_HOST=nginx.${HOST}
+      - LETSENCRYPT_HOST=nginx.${HOST}
+    expose:
+      - 4001
+
+volumes:
+  conf:
+  vhost:
+  html:
