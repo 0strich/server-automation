@@ -17,7 +17,7 @@ services:
       - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     restart: always
 
-  letsencrypt-nginx-proxy:
+  letsencrypd-nginx-proxy:
     container_name: letsencrypt-nginx-proxy
     image: jrcs/letsencrypt-nginx-proxy-companior
     depends_on:
@@ -29,7 +29,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: always
 
-  user-frontend:
+  reactjs:
+    container_name: reactjs
+    biuld:
+      context: /project/reactjs
+      dockerfile: Dockerfile
     environment:
       - VIRTUAL_HOST=reactjs.${HOST}
       - LETSENCRYPT_HOST=reactjs.${HOST}
@@ -37,6 +41,10 @@ services:
       - 3000
 
   express:
+    container_name: express
+    biuld:
+      context: /project/nodejs
+      dockerfile: Dockerfile
     environment:
       - VIRTUAL_HOST=nginx.${HOST}
       - LETSENCRYPT_HOST=nginx.${HOST}
