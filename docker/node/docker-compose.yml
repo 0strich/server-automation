@@ -14,6 +14,7 @@ services:
     environment:
       - NODE_ENV=production
       - VIRTUAL_HOST=nodejs.saltmine.io
+      - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=nodejs.saltmine.io
       - LETSENCRYPT_EMAIL=rich@salt-mine.io
     restart: always
@@ -30,6 +31,7 @@ services:
       - ./my-react/src:/project/myreact/src
     environment:
       - VIRTUAL_HOST=reactjs.saltmine.io
+      - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=reactjs.saltmine.io
       - LETSENCRYPT_EMAIL=rich@salt-mine.io
     restart: always

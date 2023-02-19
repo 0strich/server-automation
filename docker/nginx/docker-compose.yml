@@ -1,0 +1,42 @@
+version: "3.3"
+
+services:
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/log:/var/log/nginx
+      - ./www:/var/www/html
+    ports:
+      - 80:80
+      - 443:443
+
+  certbot:
+    depends_on:
+      - nginx
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/etc:/etc/letsencrypt
+      - ./certbot/var:/var/lib/letsencrypt
+      - ./www:/var/www/html
+    command: certonly --webroot --webroot-path=/var/www/html --email gee8196@gmail.com --agree-tos --no-eff-email --force-renewal -d nodejs.saltmine.io -d www.nodejs.saltmine.io
+
+  nginx-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:stable
+    container_name: ${LETS_ENCRYPT:-nginx-letsencrypt}
+    restart: always
+    volumes:
+      - ${NGINX_FILES_PATH:-./data}/conf.d:/etc/nginx/conf.d
+      - ${NGINX_FILES_PATH:-./data}/vhost.d:/etc/nginx/vhost.d
+      - ${NGINX_FILES_PATH:-./data}/html:/usr/share/nginx/html
+      - ${NGINX_FILES_PATH:-./data}/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      NGINX_DOCKER_GEN_CONTAINER: ${DOCKER_GEN:-nginx-gen}
+      NGINX_PROXY_CONTAINER: ${NGINX_WEB:-nginx-web}
+    logging:
+      driver: ${NGINX_LETSENCRYPT_LOG_DRIVER:-json-file}
+      options:
+        max-size: ${NGINX_LETSENCRYPT_LOG_MAX_SIZE:-2m}
+        max-file: ${NGINX_LETSENCRYPT_LOG_MAX_FILE:-10}
