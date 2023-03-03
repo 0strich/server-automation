@@ -14,7 +14,7 @@ function up() {
 
 function down() {
   docker-compose down
-  ./clean.sh
+  clean
   docker images
 }
 
@@ -24,11 +24,11 @@ function rebuild() {
 }
 
 function run() {
-  if [ -z "${1}" ]; then
+  if [ -z "${2}" ]; then
     echo "Usage: run <container_name>"
     return 1
   fi
-  command docker exec -it "${1}" /bin/sh
+  command docker exec -it "${2}" /bin/sh
 }
 
 if [ "$1" == "clean" ]; then
@@ -37,4 +37,9 @@ elif [ "$1" == "up" ]; then
   up
 elif [ "$1" == "down" ]; then
   down
-elif [ "$1" == "rebuild"
+elif [ "$1" == "rebuild" ]; then
+  down
+  up
+elif [ "$1" == "run" ]; then
+  run "$@"
+fi
