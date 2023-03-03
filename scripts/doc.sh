@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function clean() {
   docker system prune -a -f
   docker image prune -a -f
@@ -12,7 +14,7 @@ function up() {
 
 function down() {
   docker-compose down
-  clean
+  ./clean.sh
   docker images
 }
 
@@ -22,7 +24,11 @@ function rebuild() {
 }
 
 function run() {
-  docker exec -it $2 /bin/sh
+  if [ -z "${1}" ]; then
+    echo "Usage: run <container_name>"
+    return 1
+  fi
+  command docker exec -it "${1}" /bin/sh
 }
 
 if [ "$1" == "clean" ]; then
@@ -31,8 +37,4 @@ elif [ "$1" == "up" ]; then
   up
 elif [ "$1" == "down" ]; then
   down
-elif [ "$1" == "rebuild" ]; then
-  rebuild
-elif [ "$1" == "run" ]; then
-  run
-fi
+elif [ "$1" == "rebuild"
