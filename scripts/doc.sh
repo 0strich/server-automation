@@ -28,7 +28,7 @@ function run() {
     echo "Usage: run <container_name>"
     return 1
   fi
-  command docker exec -it "${2}" "/bin/sh -c 'ls -al'"
+  command docker exec -it "${2}" /bin/sh
 }
 
 if [ "$1" == "clean" ]; then
